@@ -11,7 +11,7 @@ class DoubanSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://www.douban.com/group/haixiuzu/discussion?start=0',
+            'https://www.douban.com/group/haixiuzu/discussion?start=100',
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -29,7 +29,8 @@ class DoubanSpider(scrapy.Spider):
             model = l.load_item()
             contents.append(model)
         douban_db.insert_models('douban_topic',contents)
-
+        if len(contents) == 0:
+            return
         url = response.url
         url_array = url.split('=')
         new_url = url_array[0] + '=' +str(int(url_array[1]) + 25)
