@@ -9,9 +9,12 @@ from ..DBHelper import douban_db
 class DoubanSpider(scrapy.Spider):
     name = "douban"
 
+    def __init__(self,start = 0):
+        self.start = start
+
     def start_requests(self):
         urls = [
-            'https://www.douban.com/group/haixiuzu/discussion?start=100',
+            'https://www.douban.com/group/haixiuzu/discussion?start=%s'%self.start,
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -30,7 +33,7 @@ class DoubanSpider(scrapy.Spider):
             contents.append(model)
         douban_db.insert_models('douban_topic',contents)
         if len(contents) == 0:
-            return
+            time.sleep(600)
         url = response.url
         url_array = url.split('=')
         new_url = url_array[0] + '=' +str(int(url_array[1]) + 25)
